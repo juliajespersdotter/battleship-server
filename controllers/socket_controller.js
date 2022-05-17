@@ -10,19 +10,16 @@ const games = [
 	{
 		id: "1",
 		name: "1",
-		open: true,
 		players: {},
 	},
 	{
 		id: "2",
 		name: "2",
-		open: true,
 		players: {},
 	},
 	{
 		id: "3",
 		name: "3",
-		open: true,
 		players: {},
 	},
 ];
@@ -54,11 +51,14 @@ const getGameByUserId = (id) => {
 const handleGetGameList = function (callback) {
 	// generate a list of rooms with only their id and name
 	const game_list = games.map((game) => {
-		return {
-			id: game.id,
-			name: game.name,
-			open: true,
-		};
+		if (Object.keys(game.players).length < 2) {
+			return {
+				id: game.id,
+				name: game.name,
+			};
+		} else {
+			return false;
+		}
 	});
 
 	// send list of rooms back to the client
