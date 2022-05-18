@@ -102,7 +102,17 @@ const handlePlayerJoined = async function (username, game_id, callback) {
 
 	// add socket to list of players in this game
 	// a) find room object with `id` === `general`
-	const game = getGameById(game_id);
+	let game = getGameById(game_id);
+
+	if (!game) {
+		let newGame = {
+			id: game_id,
+			name: game_id,
+			players: {},
+		};
+		games.push(newGame);
+		game = getGameById(game_id);
+	}
 
 	// b) add socket to room's `users` object
 	game.players[this.id] = username;
@@ -137,6 +147,7 @@ const handlePlayerLeft = async function (username, game_id) {
 
 	// b) remove socket from game's `users` object
 	delete game.players[this.id];
+	delete game;
 
 	// let everyone know that someone left the game
 	this.broadcast.to(game.id).emit("player:left", username);
@@ -164,6 +175,8 @@ module.exports = function (socket, _io) {
 	socket.on("update-list", () => {
 		io.emit("new-game-list");
 	});
+
+	// socket.on("create-custom", handleCreateCustom);
 
 	// handle user leave
 	socket.on("player:left", handlePlayerLeft);
