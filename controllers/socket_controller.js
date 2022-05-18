@@ -161,6 +161,10 @@ module.exports = function (socket, _io) {
 	// handle get game list request
 	socket.on("get-game-list", handleGetGameList);
 
+	socket.on("update-list", () => {
+		io.emit("new-game-list");
+	});
+
 	// handle user leave
 	socket.on("player:left", handlePlayerLeft);
 
