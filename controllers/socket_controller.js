@@ -88,6 +88,10 @@ const handleDisconnect = function () {
 	// remove user from list of users in that game
 	delete game.players[this.id];
 
+	if (Object.keys(game.players).length === 0) {
+		delete game;
+	}
+
 	// broadcast list of users in game to all connected sockets EXCEPT ourselves
 	this.broadcast.to(game.id).emit("player:list", game.players);
 };
@@ -112,6 +116,8 @@ const handlePlayerJoined = async function (username, game_id, callback) {
 		};
 		games.push(newGame);
 		game = getGameById(game_id);
+
+		console.log("new game:", game);
 	}
 
 	// b) add socket to room's `users` object
@@ -147,13 +153,17 @@ const handlePlayerLeft = async function (username, game_id) {
 
 	// b) remove socket from game's `users` object
 	delete game.players[this.id];
-	delete game;
+	console.log(game.players);
+
+	if (Object.keys(game.players).length === 0) {
+		delete game;
+	}
 
 	// let everyone know that someone left the game
 	this.broadcast.to(game.id).emit("player:left", username);
 
 	// broadcast list of users to everyone in the game
-	io.to(game.id).emit("user:list", game.players);
+	io.to(game.id).emit("player:list", game.players);
 };
 
 /**
