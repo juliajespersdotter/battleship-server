@@ -65,6 +65,21 @@ const handleGetGameList = function (callback) {
 	callback(game_list);
 };
 
+const handleCheckGames = function (game, callback) {
+	let newGame = getGameById(game);
+
+	if (!newGame) {
+		callback({
+			success: true,
+		});
+		return;
+	}
+
+	callback({
+		success: false,
+	});
+};
+
 /**
  * Handle a user disconnecting
  *
@@ -89,7 +104,8 @@ const handleDisconnect = function () {
 	delete game.players[this.id];
 
 	if (Object.keys(game.players).length === 0) {
-		delete game;
+		delete game.id;
+		delete game.name;
 	}
 
 	// broadcast list of users in game to all connected sockets EXCEPT ourselves
@@ -156,7 +172,8 @@ const handlePlayerLeft = async function (username, game_id) {
 	console.log(game.players);
 
 	if (Object.keys(game.players).length === 0) {
-		delete game;
+		delete game.id;
+		delete game.name;
 	}
 
 	// let everyone know that someone left the game
@@ -187,6 +204,8 @@ module.exports = function (socket, _io) {
 	});
 
 	// socket.on("create-custom", handleCreateCustom);
+
+	socket.on("check-games", handleCheckGames);
 
 	// handle user leave
 	socket.on("player:left", handlePlayerLeft);
