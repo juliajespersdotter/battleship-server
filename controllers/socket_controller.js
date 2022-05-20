@@ -8,18 +8,21 @@ let io = null; // socket.io server instance
 // list of games and their connected players
 const games = [
 	{
-		id: "1",
-		name: "1",
+		id: "room1",
+		name: "Open room 1",
+		neverDelete: true,
 		players: {},
 	},
 	{
-		id: "2",
-		name: "2",
+		id: "room2",
+		name: "Open room 2",
+		neverDelete: true,
 		players: {},
 	},
 	{
-		id: "3",
-		name: "3",
+		id: "room3",
+		name: "Open room 3",
+		neverDelete: true,
 		players: {},
 	},
 ];
@@ -103,7 +106,7 @@ const handleDisconnect = function () {
 	// remove player from list of users in that game
 	delete game.players[this.id];
 
-	if (Object.keys(game.players).length === 0) {
+	if (Object.keys(game.players).length === 0 && game.neverDelete === false) {
 		delete game.id;
 		delete game.name;
 	}
@@ -129,6 +132,7 @@ const handlePlayerJoined = async function (username, game_id, callback) {
 		let newGame = {
 			id: game_id,
 			name: game_id,
+			neverDelete: false,
 			players: {},
 		};
 		games.push(newGame);
@@ -170,7 +174,7 @@ const handlePlayerLeft = async function (username, game_id) {
 	delete game.players[this.id];
 	console.log(game.players);
 
-	if (Object.keys(game.players).length === 0) {
+	if (Object.keys(game.players).length === 0 && game.neverDelete === false) {
 		delete game.id;
 		delete game.name;
 		console.log("game after delete:", game);
