@@ -5,7 +5,7 @@
 const debug = require("debug")("battleship:socket_controller");
 let io = null; // socket.io server instance
 
-// list of rooms and their connected users
+// list of games and their connected players
 const games = [
 	{
 		id: "1",
@@ -25,9 +25,9 @@ const games = [
 ];
 
 /**
- * Get room by ID
+ * Get game by ID
  *
- * @param {String} id ID of Room to get
+ * @param {String} id ID of Game to get
  * @returns
  */
 const getGameById = (id) => {
@@ -35,9 +35,9 @@ const getGameById = (id) => {
 };
 
 /**
- * Get room by User ID
+ * Get room by Player ID
  *
- * @param {String} id Socket ID of User to get Room by
+ * @param {String} id Socket ID of Player to get Game by
  * @returns
  */
 const getGameByUserId = (id) => {
@@ -45,11 +45,11 @@ const getGameByUserId = (id) => {
 };
 
 /**
- * Handle a user requesting a list of rooms
+ * Handle a player requesting a list of games
  *
  */
 const handleGetGameList = function (callback) {
-	// generate a list of rooms with only their id and name
+	// generate a list of games with only their id and name
 	const game_list = games.map((game) => {
 		if (Object.keys(game.players).length < 2) {
 			return {
@@ -61,7 +61,7 @@ const handleGetGameList = function (callback) {
 		}
 	});
 
-	// send list of rooms back to the client
+	// send list of games back to the client
 	callback(game_list);
 };
 
@@ -87,7 +87,7 @@ const handleCheckGames = function (game, callback) {
 const handleDisconnect = function () {
 	debug(`Client ${this.id} disconnected :(`);
 
-	// find the room that this socket is part of
+	// find the game that this socket is part of
 	const game = getGameByUserId(this.id);
 
 	// if socket was not in a game, don't broadcast disconnect
@@ -95,12 +95,12 @@ const handleDisconnect = function () {
 		return;
 	}
 
-	// let everyone in the game know that this user has disconnected
+	// let everyone in the game know that this player has disconnected
 	this.broadcast
 		.to(game.id)
 		.emit("player:disconnected", game.players[this.id]);
 
-	// remove user from list of users in that game
+	// remove player from list of users in that game
 	delete game.players[this.id];
 
 	if (Object.keys(game.players).length === 0) {
@@ -108,7 +108,7 @@ const handleDisconnect = function () {
 		delete game.name;
 	}
 
-	// broadcast list of users in game to all connected sockets EXCEPT ourselves
+	// broadcast list of players in game to all connected sockets EXCEPT ourselves
 	this.broadcast.to(game.id).emit("player:list", game.players);
 };
 
@@ -136,7 +136,7 @@ const handlePlayerJoined = async function (username, game_id, callback) {
 		console.log("new game:", game);
 	}
 
-	// b) add socket to room's `users` object
+	// b) add socket to game's `players` object
 	game.players[this.id] = username;
 
 	// let everyone know that someone has joined the game
@@ -149,12 +149,12 @@ const handlePlayerJoined = async function (username, game_id, callback) {
 		players: game.players,
 	});
 
-	// broadcast list of users to everyone in the room
+	// broadcast list of players to everyone in the room
 	io.to(game.id).emit("player:list", game.players);
 };
 
 /**
- * Handle a user leaving a room
+ * Handle a player leaving a room
  *
  */
 const handlePlayerLeft = async function (username, game_id) {
@@ -163,11 +163,9 @@ const handlePlayerLeft = async function (username, game_id) {
 	// leave game
 	this.leave(game_id);
 
-	// remove socket from list of online users in this game
-	// a) find game object with `id` === `general`
+	// remove socket from list of online players in this game
 	const game = getGameById(game_id);
 
-	// b) remove socket from game's `users` object
 	delete game.players[this.id];
 	console.log(game.players);
 
@@ -179,7 +177,7 @@ const handlePlayerLeft = async function (username, game_id) {
 	// let everyone know that someone left the game
 	this.broadcast.to(game.id).emit("player:left", username);
 
-	// broadcast list of users to everyone in the game
+	// broadcast list of players to everyone in the game
 	io.to(game.id).emit("player:list", game.players);
 };
 
