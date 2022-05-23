@@ -67,10 +67,10 @@ const handleGetGameList = function (callback) {
 	});
 
 	// sort game list based on number of players to be displayed in client
-	game_list.sort(
-		(a, b) => Object.keys(a.players).length - Object.keys(b.players).length
-	);
-	console.log("sorted list", game_list);
+	// game_list.sort(
+	// 	(a, b) => Object.keys(a.players).length - Object.keys(b.players).length
+	// );
+	// console.log("sorted list", game_list);
 
 	// send list of games back to the client
 	callback(game_list);
