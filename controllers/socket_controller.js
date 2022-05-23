@@ -9,19 +9,19 @@ let io = null; // socket.io server instance
 const games = [
 	{
 		id: "room1",
-		name: "Open room 1",
+		name: "room 1",
 		neverDelete: true,
 		players: {},
 	},
 	{
 		id: "room2",
-		name: "Open room 2",
+		name: "room 2",
 		neverDelete: true,
 		players: {},
 	},
 	{
 		id: "room3",
-		name: "Open room 3",
+		name: "room 3",
 		neverDelete: true,
 		players: {},
 	},
@@ -53,6 +53,7 @@ const getGameByUserId = (id) => {
  */
 const handleGetGameList = function (callback) {
 	// generate a list of games with only their id and name
+
 	const game_list = games.map((game) => {
 		if (Object.keys(game.players).length < 2) {
 			return {
@@ -64,6 +65,12 @@ const handleGetGameList = function (callback) {
 			return false;
 		}
 	});
+
+	// sort game list based on number of players to be displayed in client
+	game_list.sort(
+		(a, b) => Object.keys(a.players).length - Object.keys(b.players).length
+	);
+	console.log("sorted list", game_list);
 
 	// send list of games back to the client
 	callback(game_list);
