@@ -58,6 +58,7 @@ const handleGetGameList = function (callback) {
 			return {
 				id: game.id,
 				name: game.name,
+				players: game.players,
 			};
 		} else {
 			return false;
