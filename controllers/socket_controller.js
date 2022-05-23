@@ -9,19 +9,19 @@ let io = null; // socket.io server instance
 const games = [
 	{
 		id: "room1",
-		name: "room 1",
+		name: "room",
 		neverDelete: true,
 		players: {},
 	},
 	{
 		id: "room2",
-		name: "room 2",
+		name: "room",
 		neverDelete: true,
 		players: {},
 	},
 	{
 		id: "room3",
-		name: "room 3",
+		name: "room",
 		neverDelete: true,
 		players: {},
 	},
