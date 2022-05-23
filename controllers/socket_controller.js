@@ -184,6 +184,10 @@ const handlePlayerLeft = async function (username, game_id) {
 	io.emit("new-game-list");
 };
 
+const handleShipData = async function(game_id, shipdata1, shipdata2, shipdata3, shipdata4) {
+	this.broadcast.to(game_id).emit("get-ship-data", shipdata1, shipdata2, shipdata3, shipdata4);
+}
+
 /**
  * Export controller and attach handlers to events
  *
@@ -203,6 +207,8 @@ module.exports = function (socket, _io) {
 	socket.on("update-list", () => {
 		io.emit("new-game-list");
 	});
+
+	socket.on('ship-data', handleShipData);
 
 	// socket.on("create-custom", handleCreateCustom);
 
