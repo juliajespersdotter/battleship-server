@@ -206,15 +206,14 @@ const handleShipData = function (shipData) {
 	if (shipData.shipTwo !== null) {
 		shipData["player"] = this.id;
 		shipLocations.push(shipData);
-		console.log("ship locations", shipLocations);
+		// console.log("ship locations", shipLocations);
 		this.broadcast.to(shipData.id).emit("get-ship-data", shipData);
 	}
 };
 
-const handleEnemyClick = function (hitShip) {
-	const id = hitShip[0];
-	this.broadcast.to(id).emit("get-enemy-click-hit", hitShip[1]);
-	console.log("hitship", hitShip);
+const handleAttackShip = function (game_id, attackClick) {
+	this.broadcast.to(game_id).emit("get-enemy-click", attackClick);
+	// console.log("hitship", attackClick);
 };
 
 /**
@@ -249,5 +248,5 @@ module.exports = function (socket, _io) {
 	// handle player joined
 	socket.on("player:joined", handlePlayerJoined);
 
-	socket.on("click-data-hit", handleEnemyClick);
+	socket.on("click-data-hit", handleAttackShip);
 };
