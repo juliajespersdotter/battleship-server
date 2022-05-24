@@ -213,7 +213,7 @@ const handleShipData = function (shipData) {
 
 const handleAttackShip = function (game_id, attackClick) {
 	this.broadcast.to(game_id).emit("get-enemy-click", attackClick);
-	// console.log("hitship", attackClick);
+	console.log("hitship", attackClick);
 };
 
 /**
