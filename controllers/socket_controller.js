@@ -200,6 +200,13 @@ const handleShipData = async function(game_id, shipdata1, shipdata2, shipdata3, 
 	this.broadcast.to(game_id).emit("get-ship-data", shipdata1, shipdata2, shipdata3, shipdata4);
 }
 
+const handleEnemyClick = function(hitShip) {
+	
+	const id = hitShip[0];
+	this.broadcast.to(id).emit('get-enemy-click-hit', hitShip[1]);
+	console.log('hitship', hitShip)
+}
+
 /**
  * Export controller and attach handlers to events
  *
@@ -231,4 +238,6 @@ module.exports = function (socket, _io) {
 
 	// handle player joined
 	socket.on("player:joined", handlePlayerJoined);
+
+	socket.on('click-data-hit', handleEnemyClick)
 };
