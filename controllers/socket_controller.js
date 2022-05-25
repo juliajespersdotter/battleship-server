@@ -154,7 +154,7 @@ const handlePlayerJoined = async function (username, game_id, callback) {
 
 	// let everyone know that someone has joined the game
 	this.broadcast.to(game.id).emit("player:joined", username);
-
+	
 	// confirm join
 	callback({
 		success: true,
@@ -193,6 +193,7 @@ const handlePlayerLeft = async function (username, game_id) {
 
 	// broadcast list of players to everyone in the game
 	io.to(game.id).emit("player:list", game.players);
+	
 	io.emit("new-game-list");
 };
 
