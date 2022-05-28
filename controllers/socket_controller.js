@@ -206,7 +206,7 @@ const handleShipData = function (shipData) {
 	if (shipData.shipTwo !== null) {
 		shipData["player"] = this.id;
 		shipLocations.push(shipData);
-		// console.log("ship locations", shipLocations);
+		console.log("ship locations", shipLocations);
 		this.broadcast.to(shipData.id).emit("get-ship-data", shipData);
 	}
 };
@@ -214,6 +214,23 @@ const handleShipData = function (shipData) {
 const handleAttackShip = function (game_id, attackClick) {
 	this.broadcast.to(game_id).emit("get-enemy-click", attackClick);
 	console.log("hitship", attackClick);
+};
+
+const handleGameOver = function (username, game_id, callback) {
+	// const game = getGameById(game_id);
+
+	io.to(game_id).emit("winner", username);
+
+	// if (!game) {
+	// 	callback({
+	// 		success: false,
+	// 	});
+	// } else {
+	// 	callback({
+	// 		success: true,
+	// 		winner: username,
+	// 	});
+	// }
 };
 
 /**
@@ -238,7 +255,7 @@ module.exports = function (socket, _io) {
 
 	socket.on("ship-data", handleShipData);
 
-	// socket.on("create-custom", handleCreateCustom);
+	socket.on("game-over", handleGameOver);
 
 	socket.on("check-games", handleCheckGames);
 
