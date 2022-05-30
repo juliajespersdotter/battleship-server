@@ -156,7 +156,7 @@ const handlePlayerJoined = async function (username, game_id, callback) {
 
 	// let everyone know that someone has joined the game
 	this.broadcast.to(game.id).emit("player:joined", username);
-	
+
 	// confirm join
 	callback({
 		success: true,
@@ -195,7 +195,7 @@ const handlePlayerLeft = async function (username, game_id) {
 
 	// broadcast list of players to everyone in the game
 	io.to(game.id).emit("player:list", game.players);
-	
+
 	io.emit("new-game-list");
 };
 
@@ -234,6 +234,10 @@ const handleGameOver = function (username, game_id, callback) {
 	// }
 };
 
+const handleWhoseTurnServer = function (turn, game_id) {
+	io.to(game_id).emit("get-whose-turn", turn);
+};
+
 /**
  * Export controller and attach handlers to events
  *
@@ -267,4 +271,6 @@ module.exports = function (socket, _io) {
 	socket.on("player:joined", handlePlayerJoined);
 
 	socket.on("click-data-hit", handleAttackShip);
+
+	socket.on("whose-turn", handleWhoseTurnServer);
 };
