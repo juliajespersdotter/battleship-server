@@ -205,7 +205,11 @@ const handleEnemyClick = function(hitShip) {
 	
 	const id = hitShip[0];
 	this.broadcast.to(id).emit('get-enemy-click-hit', hitShip[1]);
-	console.log('hitship', hitShip)
+	
+}
+
+const handleWhoseTurnServer = function(turn, game_id) {
+	io.to(game_id).emit('get-whose-turn', turn);
 }
 
 /**
@@ -240,5 +244,7 @@ module.exports = function (socket, _io) {
 	// handle player joined
 	socket.on("player:joined", handlePlayerJoined);
 
-	socket.on('click-data-hit', handleEnemyClick)
+	socket.on('click-data-hit', handleEnemyClick);
+
+	socket.on('whose-turn', handleWhoseTurnServer);
 };
