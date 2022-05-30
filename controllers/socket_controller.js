@@ -196,7 +196,8 @@ const handlePlayerLeft = async function (username, game_id) {
 	io.emit("new-game-list");
 };
 
-const handleShipData = async function(game_id, shipdata1, shipdata2, shipdata3, shipdata4) {
+const handleShipData = function(game_id, shipdata1, shipdata2, shipdata3, shipdata4) {
+	console.log('inside socket controller get-ship-data')
 	this.broadcast.to(game_id).emit("get-ship-data", shipdata1, shipdata2, shipdata3, shipdata4);
 }
 
