@@ -27,7 +27,7 @@ const games = [
 	},
 ];
 
-const shipLocations = [];
+// const shipLocations = [];
 
 /**
  * Get game by ID
@@ -135,7 +135,6 @@ const handlePlayerJoined = async function (username, game_id, callback) {
 	this.join(game_id);
 
 	// add socket to list of players in this game
-	// a) find room object with `id` === `general`
 	let game = getGameById(game_id);
 
 	if (!game) {
@@ -205,16 +204,14 @@ const handlePlayerLeft = async function (username, game_id) {
  */
 const handleShipData = function (shipData) {
 	if (shipData.shipTwo !== null) {
-		shipData["player"] = this.id;
-		shipLocations.push(shipData);
-		console.log("ship locations", shipLocations);
+		// shipData["player"] = this.id;
+		// shipLocations.push(shipData);
 		this.broadcast.to(shipData.id).emit("get-ship-data", shipData);
 	}
 };
 
 const handleAttackShip = function (game_id, attackClick) {
 	this.broadcast.to(game_id).emit("get-enemy-click", attackClick);
-	console.log("hitship", attackClick);
 };
 
 const handleGameOver = function (username, game_id, callback) {
