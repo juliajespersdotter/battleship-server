@@ -207,6 +207,13 @@ const handleEnemyClick = function(hitShip) {
 	this.broadcast.to(id).emit('get-enemy-click-hit', hitShip[1]);
 	
 }
+// let playersReady = [];
+
+const handlePlayersReady = function(game_id) {
+console.log('got info att player is ready and sending to enemy at player is ready')
+
+io.to(game_id).emit('start-game');
+}
 
 const handleWhoseTurnServer = function(turn, game_id) {
 	io.to(game_id).emit('get-whose-turn', turn);
@@ -247,4 +254,6 @@ module.exports = function (socket, _io) {
 	socket.on('click-data-hit', handleEnemyClick);
 
 	socket.on('whose-turn', handleWhoseTurnServer);
+
+	socket.on('player-ready', handlePlayersReady)
 };
