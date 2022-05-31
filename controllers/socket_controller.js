@@ -208,7 +208,7 @@ const handleEnemyClick = function(hitShip) {
 	this.broadcast.to(id).emit('get-enemy-click-hit', hitShip[1]);
 	
 }
-// let playersReady = [];
+
 
 const handlePlayersReady = function(game_id) {
 console.log('got info att player is ready and sending to enemy at player is ready')
