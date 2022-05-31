@@ -27,6 +27,8 @@ const games = [
 	},
 ];
 
+// const shipLocations = [];
+
 /**
  * Get game by ID
  *
@@ -133,7 +135,6 @@ const handlePlayerJoined = async function (username, game_id, callback) {
 	this.join(game_id);
 
 	// add socket to list of players in this game
-	// a) find room object with `id` === `general`
 	let game = getGameById(game_id);
 
 	if (!game) {
@@ -197,22 +198,45 @@ const handlePlayerLeft = async function (username, game_id) {
 	io.emit("new-game-list");
 };
 
-const handleShipData = function (game_id, shipData) {
-	console.log("inside socket controller get-ship-data");
-	this.broadcast.to(game_id).emit("get-ship-data", shipData);
-};
-
-const handleEnemyClick = function (hitShip) {
-	const id = hitShip[0];
-	this.broadcast.to(id).emit("get-enemy-click-hit", hitShip[1]);
-};
-
 const handlePlayersReady = function (game_id) {
 	console.log(
 		"got info att player is ready and sending to enemy at player is ready"
 	);
 
 	io.to(game_id).emit("start-game");
+};
+
+/**
+ *
+ * @param {Object of ships} shipData
+ */
+const handleShipData = function (shipData) {
+	if (shipData.shipTwo !== null) {
+		// shipData["player"] = this.id;
+		// shipLocations.push(shipData);
+		this.broadcast.to(shipData.id).emit("get-ship-data", shipData);
+	}
+};
+
+const handleAttackShip = function (game_id, attackClick) {
+	this.broadcast.to(game_id).emit("get-enemy-click", attackClick);
+};
+
+const handleGameOver = function (username, game_id, callback) {
+	// const game = getGameById(game_id);
+
+	io.to(game_id).emit("winner", username);
+
+	// if (!game) {
+	// 	callback({
+	// 		success: false,
+	// 	});
+	// } else {
+	// 	callback({
+	// 		success: true,
+	// 		winner: username,
+	// 	});
+	// }
 };
 
 const handleWhoseTurnServer = function (turn, game_id) {
@@ -241,7 +265,7 @@ module.exports = function (socket, _io) {
 
 	socket.on("ship-data", handleShipData);
 
-	// socket.on("create-custom", handleCreateCustom);
+	socket.on("game-over", handleGameOver);
 
 	socket.on("check-games", handleCheckGames);
 
@@ -251,7 +275,7 @@ module.exports = function (socket, _io) {
 	// handle player joined
 	socket.on("player:joined", handlePlayerJoined);
 
-	socket.on("click-data-hit", handleEnemyClick);
+	socket.on("click-data-hit", handleAttackShip);
 
 	socket.on("whose-turn", handleWhoseTurnServer);
 
