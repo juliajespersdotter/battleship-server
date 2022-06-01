@@ -203,7 +203,8 @@ const handlePlayerLeft = async function (username, game_id) {
  * @param {Object of ships} shipData
  */
 const handleShipData = function (shipData) {
-	if (shipData.shipTwo !== null) {
+	console.log('ship data', shipData)
+	if (shipData.shipTwo.length !== 0 && shipData.shipFour.length !== 0) {
 		// shipData["player"] = this.id;
 		// shipLocations.push(shipData);
 		this.broadcast.to(shipData.id).emit("get-ship-data", shipData);
@@ -234,7 +235,7 @@ const handleGameOver = function (username, game_id, callback) {
 
 const handlePlayersReady = function(game_id) {
 console.log('got info att player is ready and sending to enemy at player is ready')
-
+console.log('handleplayersready',this.id)
 io.to(game_id).emit('start-game');
 }
 
