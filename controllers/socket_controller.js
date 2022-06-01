@@ -222,20 +222,8 @@ const handleAttackShip = function (game_id, attackClick, turn) {
 };
 
 const handleGameOver = function (username, game_id, callback) {
-	// const game = getGameById(game_id);
 
 	io.to(game_id).emit("winner", username);
-
-	// if (!game) {
-	// 	callback({
-	// 		success: false,
-	// 	});
-	// } else {
-	// 	callback({
-	// 		success: true,
-	// 		winner: username,
-	// 	});
-	// }
 };
 
 const handlePlayersReady = function (game_id) {
@@ -246,12 +234,6 @@ const handlePlayersReady = function (game_id) {
 	io.to(game_id).emit("start-game");
 };
 
-
-/*
-const handleWhoseTurnServer = function (turn, game_id) {
-	io.to(game_id).emit("get-whose-turn", turn);
-};
-*/
 
 /**
  * Export controller and attach handlers to events
@@ -288,8 +270,6 @@ module.exports = function (socket, _io) {
 	socket.on("player:joined", handlePlayerJoined);
 
 	socket.on("click-data-hit", handleAttackShip);
-
-	// socket.on("whose-turn", handleWhoseTurnServer);
 
 	socket.on('player-ready', handlePlayersReady)
 };
