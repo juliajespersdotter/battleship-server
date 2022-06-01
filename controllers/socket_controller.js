@@ -6,26 +6,8 @@ const debug = require("debug")("battleship:socket_controller");
 let io = null; // socket.io server instance
 
 // list of games and their connected players
-const games = [
-	{
-		id: "room1",
-		name: "room",
-		neverDelete: true,
-		players: {},
-	},
-	{
-		id: "room2",
-		name: "room",
-		neverDelete: true,
-		players: {},
-	},
-	{
-		id: "room3",
-		name: "room",
-		neverDelete: true,
-		players: {},
-	},
-];
+
+const games = [];
 
 const shipLocations = [];
 
@@ -181,7 +163,7 @@ const handlePlayerLeft = async function (username, game_id) {
 	const game = getGameById(game_id);
 
 	delete game.players[this.id];
-	console.log(game.players);
+	// console.log(game.players);
 
 	if (Object.keys(game.players).length === 0 && game.neverDelete === false) {
 		delete game.id;
@@ -199,9 +181,9 @@ const handlePlayerLeft = async function (username, game_id) {
 };
 
 const handlePlayersReady = function (game_id) {
-	console.log(
-		"got info att player is ready and sending to enemy at player is ready"
-	);
+	// console.log(
+	// 	"got info att player is ready and sending to enemy at player is ready"
+	// );
 
 	io.to(game_id).emit("start-game");
 };
@@ -212,14 +194,14 @@ const handlePlayersReady = function (game_id) {
  */
 const handleShipData = async function (shipData) {
 	if (shipData.shipTwo !== null) {
-		shipData["player"] = await this.id;
-		shipLocations.push(shipData);
+		// shipData["player"] = await this.id;
+		// shipLocations.push(shipData);
 		this.broadcast.to(shipData.id).emit("get-ship-data", shipData);
 	}
 };
 
 const handleShipsRemaining = function (id, totalShips) {
-	console.log("total ships in server", totalShips);
+	// console.log("total ships in server", totalShips);
 	this.broadcast.to(id).emit("get-ships-remaining", totalShips);
 };
 
@@ -245,12 +227,6 @@ const handleGameOver = function (username, game_id, callback) {
 	// 	});
 	// }
 };
-
-/*
-const handleWhoseTurnServer = function (turn, game_id) {
-	io.to(game_id).emit("get-whose-turn", turn);
-};
-*/
 
 /**
  * Export controller and attach handlers to events
