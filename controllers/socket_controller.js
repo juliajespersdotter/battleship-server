@@ -190,12 +190,20 @@ const handlePlayerLeft = async function (username, game_id) {
 	}
 
 	// let everyone know that someone left the game
-	this.broadcast.to(game.id).emit("player:left", username);
+	this.broadcast.to(game.id).emit("player:disconnect", username);
 
 	// broadcast list of players to everyone in the game
 	io.to(game.id).emit("player:list", game.players);
 
 	io.emit("new-game-list");
+};
+
+const handlePlayersReady = function (game_id) {
+	console.log(
+		"got info att player is ready and sending to enemy at player is ready"
+	);
+
+	io.to(game_id).emit("start-game");
 };
 
 /**
@@ -210,9 +218,8 @@ const handleShipData = function (shipData) {
 	}
 };
 
-const handleAttackShip = function (game_id, attackClick, turn) {
+const handleAttackShip = function (game_id, attackClick) {
 	this.broadcast.to(game_id).emit("get-enemy-click", attackClick);
-	io.to(game_id).emit("get-whose-turn", turn);
 };
 
 const handleGameOver = function (username, game_id, callback) {
@@ -230,14 +237,6 @@ const handleGameOver = function (username, game_id, callback) {
 	// 		winner: username,
 	// 	});
 	// }
-};
-
-const handlePlayersReady = function (game_id) {
-	console.log(
-		"got info att player is ready and sending to enemy at player is ready"
-	);
-
-	io.to(game_id).emit("start-game");
 };
 
 const handleWhoseTurnServer = function (turn, game_id) {
