@@ -27,7 +27,7 @@ const games = [
 	},
 ];
 
-// const shipLocations = [];
+const shipLocations = [];
 
 /**
  * Get game by ID
@@ -210,16 +210,18 @@ const handlePlayersReady = function (game_id) {
  *
  * @param {Object of ships} shipData
  */
-const handleShipData = function (shipData) {
+const handleShipData = async function (shipData) {
 	if (shipData.shipTwo !== null) {
-		// shipData["player"] = this.id;
-		// shipLocations.push(shipData);
+		shipData["player"] = await this.id;
+		shipLocations.push(shipData);
 		this.broadcast.to(shipData.id).emit("get-ship-data", shipData);
 	}
 };
 
-const handleAttackShip = function (game_id, attackClick) {
+const handleAttackShip = function (game_id, attackClick, turn) {
 	this.broadcast.to(game_id).emit("get-enemy-click", attackClick);
+
+	io.to(game_id).emit("get-whose-turn", turn);
 };
 
 const handleGameOver = function (username, game_id, callback) {
@@ -239,9 +241,11 @@ const handleGameOver = function (username, game_id, callback) {
 	// }
 };
 
+/*
 const handleWhoseTurnServer = function (turn, game_id) {
 	io.to(game_id).emit("get-whose-turn", turn);
 };
+*/
 
 /**
  * Export controller and attach handlers to events
@@ -277,7 +281,7 @@ module.exports = function (socket, _io) {
 
 	socket.on("click-data-hit", handleAttackShip);
 
-	socket.on("whose-turn", handleWhoseTurnServer);
+	// socket.on("whose-turn", handleWhoseTurnServer);
 
 	socket.on("player-ready", handlePlayersReady);
 };
