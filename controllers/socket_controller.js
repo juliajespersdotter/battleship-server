@@ -218,6 +218,11 @@ const handleShipData = async function (shipData) {
 	}
 };
 
+const handleShipsRemaining = function (id, totalShips) {
+	console.log("total ships in server", totalShips);
+	this.broadcast.to(id).emit("get-ships-remaining", totalShips);
+};
+
 const handleAttackShip = function (game_id, attackClick, turn) {
 	this.broadcast.to(game_id).emit("get-enemy-click", attackClick);
 
@@ -275,6 +280,8 @@ module.exports = function (socket, _io) {
 
 	// handle user leave
 	socket.on("player:left", handlePlayerLeft);
+
+	socket.on("ships-remaining", handleShipsRemaining);
 
 	// handle player joined
 	socket.on("player:joined", handlePlayerJoined);
