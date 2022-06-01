@@ -210,8 +210,9 @@ const handleShipData = function (shipData) {
 	}
 };
 
-const handleAttackShip = function (game_id, attackClick) {
+const handleAttackShip = function (game_id, attackClick, turn) {
 	this.broadcast.to(game_id).emit("get-enemy-click", attackClick);
+	io.to(game_id).emit("get-whose-turn", turn);
 };
 
 const handleGameOver = function (username, game_id, callback) {
@@ -231,16 +232,17 @@ const handleGameOver = function (username, game_id, callback) {
 	// }
 };
 
+const handlePlayersReady = function (game_id) {
+	console.log(
+		"got info att player is ready and sending to enemy at player is ready"
+	);
 
-const handlePlayersReady = function(game_id) {
-console.log('got info att player is ready and sending to enemy at player is ready')
+	io.to(game_id).emit("start-game");
+};
 
-io.to(game_id).emit('start-game');
-}
-
-const handleWhoseTurnServer = function(turn, game_id) {
-	io.to(game_id).emit('get-whose-turn', turn);
-}
+const handleWhoseTurnServer = function (turn, game_id) {
+	io.to(game_id).emit("get-whose-turn", turn);
+};
 
 /**
  * Export controller and attach handlers to events
@@ -276,7 +278,7 @@ module.exports = function (socket, _io) {
 
 	socket.on("click-data-hit", handleAttackShip);
 
-	socket.on('whose-turn', handleWhoseTurnServer);
+	socket.on("whose-turn", handleWhoseTurnServer);
 
-	socket.on('player-ready', handlePlayersReady)
+	socket.on("player-ready", handlePlayersReady);
 };
