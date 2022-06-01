@@ -180,14 +180,6 @@ const handlePlayerLeft = async function (username, game_id) {
 	io.emit("new-game-list");
 };
 
-const handlePlayersReady = function (game_id) {
-	// console.log(
-	// 	"got info att player is ready and sending to enemy at player is ready"
-	// );
-
-	io.to(game_id).emit("start-game");
-};
-
 /**
  *
  * @param {Object of ships} shipData
@@ -212,20 +204,15 @@ const handleAttackShip = function (game_id, attackClick, turn) {
 };
 
 const handleGameOver = function (username, game_id, callback) {
-	// const game = getGameById(game_id);
-
 	io.to(game_id).emit("winner", username);
+};
 
-	// if (!game) {
-	// 	callback({
-	// 		success: false,
-	// 	});
-	// } else {
-	// 	callback({
-	// 		success: true,
-	// 		winner: username,
-	// 	});
-	// }
+const handlePlayersReady = function (game_id) {
+	console.log(
+		"got info att player is ready and sending to enemy at player is ready"
+	);
+
+	io.to(game_id).emit("start-game");
 };
 
 /**
@@ -263,8 +250,6 @@ module.exports = function (socket, _io) {
 	socket.on("player:joined", handlePlayerJoined);
 
 	socket.on("click-data-hit", handleAttackShip);
-
-	// socket.on("whose-turn", handleWhoseTurnServer);
 
 	socket.on("player-ready", handlePlayersReady);
 };
