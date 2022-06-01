@@ -27,7 +27,7 @@ const games = [
 	},
 ];
 
-// const shipLocations = [];
+const shipLocations = [];
 
 /**
  * Get game by ID
@@ -202,17 +202,31 @@ const handlePlayerLeft = async function (username, game_id) {
  *
  * @param {Object of ships} shipData
  */
+<<<<<<< HEAD
 const handleShipData = function (shipData) {
 	console.log('ship data', shipData)
 	if (shipData.shipTwo.length !== 0 && shipData.shipFour.length !== 0) {
 		// shipData["player"] = this.id;
 		// shipLocations.push(shipData);
+=======
+const handleShipData = async function (shipData) {
+	if (shipData.shipTwo !== null) {
+		shipData["player"] = await this.id;
+		shipLocations.push(shipData);
+>>>>>>> 2428fd7c5d7831864147e846b1c37d3ac4693ecf
 		this.broadcast.to(shipData.id).emit("get-ship-data", shipData);
 	}
 };
 
-const handleAttackShip = function (game_id, attackClick) {
+const handleShipsRemaining = function (id, totalShips) {
+	console.log("total ships in server", totalShips);
+	this.broadcast.to(id).emit("get-ships-remaining", totalShips);
+};
+
+const handleAttackShip = function (game_id, attackClick, turn) {
 	this.broadcast.to(game_id).emit("get-enemy-click", attackClick);
+
+	io.to(game_id).emit("get-whose-turn", turn);
 };
 
 const handleGameOver = function (username, game_id, callback) {
@@ -232,6 +246,7 @@ const handleGameOver = function (username, game_id, callback) {
 	// }
 };
 
+<<<<<<< HEAD
 
 const handlePlayersReady = function(game_id) {
 console.log('got info att player is ready and sending to enemy at player is ready')
@@ -242,6 +257,13 @@ io.to(game_id).emit('start-game');
 const handleWhoseTurnServer = function(turn, game_id) {
 	io.to(game_id).emit('get-whose-turn', turn);
 }
+=======
+/*
+const handleWhoseTurnServer = function (turn, game_id) {
+	io.to(game_id).emit("get-whose-turn", turn);
+};
+*/
+>>>>>>> 2428fd7c5d7831864147e846b1c37d3ac4693ecf
 
 /**
  * Export controller and attach handlers to events
@@ -272,12 +294,18 @@ module.exports = function (socket, _io) {
 	// handle user leave
 	socket.on("player:left", handlePlayerLeft);
 
+	socket.on("ships-remaining", handleShipsRemaining);
+
 	// handle player joined
 	socket.on("player:joined", handlePlayerJoined);
 
 	socket.on("click-data-hit", handleAttackShip);
 
+<<<<<<< HEAD
 	socket.on('whose-turn', handleWhoseTurnServer);
+=======
+	// socket.on("whose-turn", handleWhoseTurnServer);
+>>>>>>> 2428fd7c5d7831864147e846b1c37d3ac4693ecf
 
 	socket.on('player-ready', handlePlayersReady)
 };
