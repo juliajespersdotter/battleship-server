@@ -165,7 +165,25 @@ const handlePlayerLeft = async function (username, game_id) {
 
 /**
  *
- * @param {Object} shipData
+ * Chat Functionality
+ */
+
+const handleChatMessage = async function (data) {
+	// debug("Someone said something: ", data);
+
+	const game = getGameById(data.game);
+
+	if (!game) {
+		return;
+	}
+
+	// emit `chat:message` event to everyone EXCEPT the sender
+	this.broadcast.to(game.id).emit("chat:message", data);
+};
+
+/**
+ *
+ * Game Functionality
  */
 const handleShipData = async function (shipData) {
 	if (shipData.shipTwo !== null) {
@@ -216,6 +234,9 @@ module.exports = function (socket, _io) {
 	socket.on("update-list", () => {
 		io.emit("new-game-list");
 	});
+
+	// handle user emitting a new message
+	socket.on("chat:message", handleChatMessage);
 
 	// handle sending ship data to opponent
 	socket.on("ship-data", handleShipData);
