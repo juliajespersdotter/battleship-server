@@ -9,8 +9,6 @@ let io = null; // socket.io server instance
 
 const games = [];
 
-const shipLocations = [];
-
 /**
  * Get game by ID
  *
@@ -49,34 +47,11 @@ const handleGetGameList = function (callback) {
 			return false;
 		}
 	});
-
-	// sort game list based on number of players to be displayed in client
-	// game_list.sort(
-	// 	(a, b) => Object.keys(a.players).length - Object.keys(b.players).length
-	// );
-	// console.log("sorted list", game_list);
-
-	// send list of games back to the client
 	callback(game_list);
 };
 
-const handleCheckGames = function (game, callback) {
-	let newGame = getGameById(game);
-
-	if (!newGame) {
-		callback({
-			success: true,
-		});
-		return;
-	}
-
-	callback({
-		success: false,
-	});
-};
-
 /**
- * Handle a user disconnecting
+ * Handle a player disconnecting
  *
  */
 const handleDisconnect = function () {
@@ -98,18 +73,22 @@ const handleDisconnect = function () {
 	// remove player from list of users in that game
 	delete game.players[this.id];
 
-	if (Object.keys(game.players).length === 0 && game.neverDelete === false) {
+	if (Object.keys(game.players).length === 0) {
 		delete game.id;
 		delete game.name;
 	}
-
-	// this.broadcast.to(game.id).emit("player:disconnect", username);
 
 	// broadcast list of players in game to all connected sockets EXCEPT ourselves
 	this.broadcast.to(game.id).emit("player:list", game.players);
 	io.emit("new-game-list");
 };
 
+/**
+ *
+ * @param {string} username
+ * @param {string}} game_id
+ * @param {game} callback
+ */
 const handlePlayerJoined = async function (username, game_id, callback) {
 	debug(
 		`User ${username} with socket id ${this.id} wants to join room '${game_id}'`
@@ -118,20 +97,18 @@ const handlePlayerJoined = async function (username, game_id, callback) {
 	// join room
 	this.join(game_id);
 
-	// add socket to list of players in this game
+	// find game
 	let game = getGameById(game_id);
 
+	// if no game, create new game
 	if (!game) {
 		let newGame = {
 			id: game_id,
 			name: game_id,
-			neverDelete: false,
 			players: {},
 		};
 		games.push(newGame);
 		game = getGameById(game_id);
-
-		console.log("new game:", game);
 	}
 
 	// b) add socket to game's `players` object
@@ -152,7 +129,7 @@ const handlePlayerJoined = async function (username, game_id, callback) {
 };
 
 /**
- * Handle a player leaving a room
+ * Handle a player leaving a game
  *
  */
 const handlePlayerLeft = async function (username, game_id) {
@@ -161,7 +138,6 @@ const handlePlayerLeft = async function (username, game_id) {
 	// leave game
 	this.leave(game_id);
 
-	// remove socket from list of online players in this game
 	const game = getGameById(game_id);
 
 	if (!game) {
@@ -169,12 +145,10 @@ const handlePlayerLeft = async function (username, game_id) {
 	}
 
 	delete game.players[this.id];
-	// console.log(game.players);
 
-	if (Object.keys(game.players).length === 0 && game.neverDelete === false) {
+	if (Object.keys(game.players).length === 0) {
 		delete game.id;
 		delete game.name;
-		console.log("game after delete:", game);
 	}
 
 	// let everyone know that someone left the game
@@ -188,36 +162,34 @@ const handlePlayerLeft = async function (username, game_id) {
 
 /**
  *
- * @param {Object of ships} shipData
+ * @param {Object} shipData
  */
 const handleShipData = async function (shipData) {
 	if (shipData.shipTwo !== null) {
-		// shipData["player"] = await this.id;
-		// shipLocations.push(shipData);
 		this.broadcast.to(shipData.id).emit("get-ship-data", shipData);
 	}
 };
 
 const handleShipsRemaining = function (id, totalShips) {
-	// console.log("total ships in server", totalShips);
+	// send ships remaining to opponent when sunk a ship
 	this.broadcast.to(id).emit("get-ships-remaining", totalShips);
 };
 
 const handleAttackShip = function (game_id, attackClick, turn) {
+	// handle player attacking a click
 	this.broadcast.to(game_id).emit("get-enemy-click", attackClick);
 
+	// change player turn after click
 	io.to(game_id).emit("get-whose-turn", turn);
 };
 
-const handleGameOver = function (username, game_id, callback) {
+const handleGameOver = function (username, game_id) {
+	// emit the winner to client
 	io.to(game_id).emit("winner", username);
 };
 
 const handlePlayersReady = function (game_id) {
-	console.log(
-		"got info att player is ready and sending to enemy at player is ready"
-	);
-
+	// start game after player set their boats
 	io.to(game_id).emit("start-game");
 };
 
@@ -237,25 +209,29 @@ module.exports = function (socket, _io) {
 	// handle get game list request
 	socket.on("get-game-list", handleGetGameList);
 
+	// handle update game list
 	socket.on("update-list", () => {
 		io.emit("new-game-list");
 	});
 
+	// handle sending ship data to opponent
 	socket.on("ship-data", handleShipData);
 
+	// handle game over
 	socket.on("game-over", handleGameOver);
 
-	socket.on("check-games", handleCheckGames);
-
-	// handle user leave
+	// handle player leaving
 	socket.on("player:left", handlePlayerLeft);
 
+	// handle ships remaining information
 	socket.on("ships-remaining", handleShipsRemaining);
 
 	// handle player joined
 	socket.on("player:joined", handlePlayerJoined);
 
+	// handle attacking ship
 	socket.on("click-data-hit", handleAttackShip);
 
+	// handle player ready and bard ready
 	socket.on("player-ready", handlePlayersReady);
 };
