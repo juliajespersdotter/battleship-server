@@ -50,13 +50,6 @@ const handleGetGameList = function (callback) {
 		}
 	});
 
-	// sort game list based on number of players to be displayed in client
-	// game_list.sort(
-	// 	(a, b) => Object.keys(a.players).length - Object.keys(b.players).length
-	// );
-	// console.log("sorted list", game_list);
-
-	// send list of games back to the client
 	callback(game_list);
 };
 
@@ -128,8 +121,6 @@ const handlePlayerJoined = async function (username, game_id, callback) {
 		};
 		games.push(newGame);
 		game = getGameById(game_id);
-
-		console.log("new game:", game);
 	}
 
 	// b) add socket to game's `players` object
@@ -163,12 +154,10 @@ const handlePlayerLeft = async function (username, game_id) {
 	const game = getGameById(game_id);
 
 	delete game.players[this.id];
-	// console.log(game.players);
 
 	if (Object.keys(game.players).length === 0 && game.neverDelete === false) {
 		delete game.id;
 		delete game.name;
-		console.log("game after delete:", game);
 	}
 
 	// let everyone know that someone left the game
@@ -193,7 +182,6 @@ const handleShipData = async function (shipData) {
 };
 
 const handleShipsRemaining = function (id, totalShips) {
-	// console.log("total ships in server", totalShips);
 	this.broadcast.to(id).emit("get-ships-remaining", totalShips);
 };
 
@@ -208,9 +196,6 @@ const handleGameOver = function (username, game_id, callback) {
 };
 
 const handlePlayersReady = function (game_id) {
-	console.log(
-		"got info att player is ready and sending to enemy at player is ready"
-	);
 
 	io.to(game_id).emit("start-game");
 };
