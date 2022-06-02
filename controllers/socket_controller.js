@@ -9,7 +9,7 @@ let io = null; // socket.io server instance
 
 const games = [];
 
-const shipLocations = [];
+// const shipLocations = [];
 
 /**
  * Get game by ID
