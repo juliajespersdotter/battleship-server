@@ -103,6 +103,8 @@ const handleDisconnect = function () {
 		delete game.name;
 	}
 
+	// this.broadcast.to(game.id).emit("player:disconnect", username);
+
 	// broadcast list of players in game to all connected sockets EXCEPT ourselves
 	this.broadcast.to(game.id).emit("player:list", game.players);
 	io.emit("new-game-list");
@@ -161,6 +163,10 @@ const handlePlayerLeft = async function (username, game_id) {
 
 	// remove socket from list of online players in this game
 	const game = getGameById(game_id);
+
+	if (!game) {
+		return;
+	}
 
 	delete game.players[this.id];
 	// console.log(game.players);
