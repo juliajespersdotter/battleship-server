@@ -152,7 +152,9 @@ const handlePlayerLeft = async function (username, game_id) {
 	}
 
 	// let everyone know that someone left the game
-	this.broadcast.to(game.id).emit("player:disconnect", username);
+	this.broadcast
+		.to(game.id)
+		.emit("player:disconnected", game.players[this.id]);
 
 	// broadcast list of players to everyone in the game
 	io.to(game.id).emit("player:list", game.players);
